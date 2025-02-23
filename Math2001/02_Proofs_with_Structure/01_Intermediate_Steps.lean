@@ -23,28 +23,34 @@ example {m n : ℤ} (h1 : m + 3 ≤ 2 * n - 1) (h2 : n ≤ 5) : m ≤ 6 := by
 
 
 example {r s : ℚ} (h1 : s + 3 ≥ r) (h2 : s + r ≤ 3) : r ≤ 3 := by
-  have h3 : r ≤ 3 + s := by sorry -- justify with one tactic
-  have h4 : r ≤ 3 - s := by sorry -- justify with one tactic
+  have h3 : r ≤ 3 + s := by addarith[h1] -- justify with one tactic
+  have h4 : r ≤ 3 - s := by addarith[h2] -- justify with one tactic
   calc
-    r = (r + r) / 2 := by sorry -- justify with one tactic
-    _ ≤ (3 - s + (3 + s)) / 2 := by sorry -- justify with one tactic
-    _ = 3 := by sorry -- justify with one tactic
+    r = 2 * r / 2 := by ring
+    _ = (r + r) / 2 := by ring
+    _ ≤ ((3 + s) + (3 - s)) / 2 := by rel[h3, h4]
+    _ = 6 / 2 := by ring
+    _ = 3 := by numbers
 
 example {t : ℝ} (h1 : t ^ 2 = 3 * t) (h2 : t ≥ 1) : t ≥ 2 := by
   have h3 :=
-  calc t * t = t ^ 2 := by ring
-    _ = 3 * t := by rw [h1]
-  cancel t at h3
-  addarith [h3]
+  calc
+    t * t = t ^ 2 := by ring
+    _ = 3 * t := by rw[h1]
+  calc
+    t = 3 := by {cancel t at h3}
+    _ ≥ 2 := by numbers
 
 
 example {a b : ℝ} (h1 : a ^ 2 = b ^ 2 + 1) (h2 : a ≥ 0) : a ≥ 1 := by
   have h3 :=
   calc
-    a ^ 2 = b ^ 2 + 1 := by rw [h1]
+    a ^ 2 = b ^ 2 + 1 := by rw[h1]
     _ ≥ 1 := by extra
-    _ = 1 ^ 2 := by ring
-  cancel 2 at h3
+    _ = 1 ^ 2 := by numbers
+  have h4 := by cancel 2 at h3
+  calc
+    a ≥ 1 := by rel[h4]
 
 
 example {x y : ℤ} (hx : x + 3 ≤ 2) (hy : y + 2 * x ≥ 3) : y > 3 := by
